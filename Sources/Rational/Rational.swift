@@ -2,8 +2,8 @@ public import Integer
 public import Magnitude
 public import Polarity
 
-/// An exact fraction of arbitrary-precision integers.
-/// The signed numerator and positive denominator are coprime; zero is 0/1.
+
+
 public struct Rational: Hashable, Sendable {
     public let numerator: Integer
     public let denominator: Integer
@@ -13,7 +13,7 @@ extension Rational {
     public enum Error: Swift.Error, Hashable, Sendable {
         case denominator
         case zero
-        /// An explicit conversion to a bounded destination exceeded its range.
+
         case overflow
         case inexact
         case unrepresentable

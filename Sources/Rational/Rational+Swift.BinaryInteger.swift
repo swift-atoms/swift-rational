@@ -31,7 +31,7 @@ extension Rational {
         try (self * Self(value)).integer(as: T.self)
     }
 
-    /// Euclidean division by a positive integral factor, with nonnegative remainder.
+
     public func quotient<T: Swift.FixedWidthInteger>(dividing value: T) throws(Error) -> (quotient: T, remainder: T) {
         guard !numerator.isZero else { throw .zero }
         guard !numerator.isNegative else { throw .unrepresentable }

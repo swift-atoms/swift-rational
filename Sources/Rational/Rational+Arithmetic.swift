@@ -15,7 +15,7 @@ extension Rational {
 
     public func subtracting(_ other: Self) -> Self { adding(-other) }
 
-    /// Cross-cancels before multiplication to limit intermediate storage.
+
     public func multiplied(by other: Self) -> Self {
         if numerator.isZero || other.numerator.isZero { return .zero }
         let a = Integer.gcd(numerator, other.denominator)
@@ -41,7 +41,7 @@ extension Rational {
         return result
     }
 
-    /// Returns a rational root only when both integer components have exact roots.
+
     public func root(_ degree: Int) -> Self? {
         guard let n = numerator.root(degree), let d = denominator.root(degree) else { return nil }
         return Self(reducing: n, denominator: d)
