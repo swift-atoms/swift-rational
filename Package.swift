@@ -4,7 +4,12 @@ import PackageDescription
 let package = Package(
     name: "swift-rational",
     platforms: [.macOS(.v27), .iOS(.v27), .tvOS(.v27), .watchOS(.v27), .visionOS(.v27)],
-    products: [.library(name: "Rational", targets: ["Rational"])],
+    products: [
+        .library(name: "Rational", targets: ["Rational"]),
+        .library(name: "Rational Standard Library Integration", targets: ["Rational Standard Library Integration"]),
+        .library(name: "Rational Foundation Library Integration", targets: ["Rational Foundation Library Integration"]),
+        .library(name: "Rational Test Support", targets: ["Rational Test Support"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-property.git", branch: "main"),
@@ -16,33 +21,66 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-polarity.git", branch: "main"),
     ],
     targets: [
-        .target(name: "Rational", dependencies: [
-            .product(name: "Tagged", package: "swift-tagged"),
-            .product(name: "Property", package: "swift-property"),
-            .product(name: "Addition", package: "swift-addition"),
-            .product(name: "Subtraction", package: "swift-subtraction"),
-            .product(name: "Multiplication", package: "swift-multiplication"),
-            .product(name: "Division", package: "swift-division"),
-            .product(name: "Magnitude", package: "swift-magnitude"),
-            .product(name: "Polarity", package: "swift-polarity"),
-        ]),
-        .testTarget(name: "Rational Tests", dependencies: [
-            .target(name: "Rational"),
-            .product(name: "Tagged", package: "swift-tagged"),
-            .product(name: "Property", package: "swift-property"),
-            .product(name: "Addition", package: "swift-addition"),
-            .product(name: "Subtraction", package: "swift-subtraction"),
-            .product(name: "Multiplication", package: "swift-multiplication"),
-            .product(name: "Division", package: "swift-division"),
-            .product(name: "Magnitude", package: "swift-magnitude"),
-            .product(name: "Polarity", package: "swift-polarity"),
-        ]),
+        .target(
+            name: "Rational",
+            dependencies: [
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Property", package: "swift-property"),
+                .product(name: "Addition", package: "swift-addition"),
+                .product(name: "Subtraction", package: "swift-subtraction"),
+                .product(name: "Multiplication", package: "swift-multiplication"),
+                .product(name: "Division", package: "swift-division"),
+                .product(name: "Magnitude", package: "swift-magnitude"),
+                .product(name: "Polarity", package: "swift-polarity"),
+            ],
+            path: "Sources/Rational"
+        ),
+        .target(
+            name: "Rational Standard Library Integration",
+            dependencies: [
+                .target(name: "Rational"),
+            ],
+            path: "Sources/Rational Standard Library Integration"
+        ),
+        .target(
+            name: "Rational Foundation Library Integration",
+            dependencies: [
+                .target(name: "Rational"),
+                .target(name: "Rational Standard Library Integration"),
+            ],
+            path: "Sources/Rational Foundation Library Integration"
+        ),
+        .target(
+            name: "Rational Test Support",
+            dependencies: [
+                .target(name: "Rational"),
+            ],
+            path: "Tests/Support"
+        ),
+        .testTarget(
+            name: "Rational Tests",
+            dependencies: [
+                .target(name: "Rational"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Property", package: "swift-property"),
+                .product(name: "Addition", package: "swift-addition"),
+                .product(name: "Subtraction", package: "swift-subtraction"),
+                .product(name: "Multiplication", package: "swift-multiplication"),
+                .product(name: "Division", package: "swift-division"),
+                .product(name: "Magnitude", package: "swift-magnitude"),
+                .product(name: "Polarity", package: "swift-polarity"),
+                .target(name: "Rational Test Support"),
+                .target(name: "Rational Standard Library Integration"),
+                .target(name: "Rational Foundation Library Integration"),
+            ],
+            path: "Tests/Rational Tests"
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
 
-for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    target.swiftSettings = (target.swiftSettings ?? []) + [
+for target in package.targets {
+    target.swiftSettings = [
         .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
