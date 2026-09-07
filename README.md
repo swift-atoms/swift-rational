@@ -18,3 +18,5 @@ Addition, subtraction and multiplication are exact, nonthrowing operations. Divi
 Integer literals use StaticBigInt. String parsing accepts signed integers and fractions. Codable now encodes the signed numerator and positive denominator as decimal strings, for example `{"numerator":"-1","denominator":"3"}`. This intentionally replaces the old bounded numeric components and separate polarity field; persisted old payloads require migration. Decoding normalizes fractions and rejects nonpositive denominators.
 
 Magnitude and Tagged integrations preserve exact arithmetic. Foundation remains outside the core target. All manifest dependencies use full GitHub URLs; build and test through atoms.xcworkspace for local resolution.
+
+`approximation(as:)` targets any BinaryFloatingPoint representation directly. It rounds the integer significands, divides them, and applies their exponent difference; it does not promise a correctly rounded rational-to-floating-point conversion. `scaledApproximation(as:)` keeps that exponent separate for consumers that apply a scale. Exact rational arithmetic and decimal-string Codable storage are unchanged.
