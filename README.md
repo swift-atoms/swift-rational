@@ -1,32 +1,20 @@
 # Rational
 
-`Rational` is an exact signed fraction with a UInt128 numerator and positive
-UInt128 denominator. Values are reduced at construction. Zero has denominator
-one and no polarity. Codable decoding enforces the same invariants.
+One exact rational type, backed by the arbitrary-precision Integer atom. The signed numerator and positive denominator are coprime; zero is always 0/1. There is no separate bounded or Unbounded rational type.
 
 ```swift
 let half = try Rational(numerator: 1, denominator: 2)
 let third = try Rational(numerator: 1, denominator: 3)
-let sum = try half.add.exact(third) // 5/6
-let difference = try half.subtract.exact(third) // 1/6
-let product = try half.multiplied(by: third) // 1/6
-let inverse = try half.inverted() // 2
+let sum = half + third // 5/6
+let huge = try Rational(10).raised(to: 200)
+let recovered = huge + 1 - huge // exactly 1
+let machineValue = try recovered.integer(as: Int8.self)
 ```
 
-Named operations and `add.exact` / `subtract.exact` expose typed errors for
-unrepresentable results. Ordinary `+`, `-`, and `*` require representable results.
-Multiplication cancels cross factors first. Addition and subtraction use temporary
-double-width products and reduce the result before checking stored bounds.
-Comparison also uses full-width products.
+Addition, subtraction and multiplication are exact, nonthrowing operations. Division and negative powers reject zero divisors. Integer exponents have arbitrary precision. `root(_:)` returns a value only for exact rational roots; symbolic irrational roots belong to the separate Radical atom.
 
-`applying(to: Int128)` and `applying(to: UInt128)` require exact integral results.
-`quotient(dividing: Int128)` divides by a positive integral value with a
-nonnegative Euclidean remainder. Zero divisors, inexact integer results, and
-bounds failures are explicit.
+`integer(as:)` and `applying(to:)` require an integral result within the explicitly chosen Swift integer type. Range and precision failures belong to these conversions, never to the rational arithmetic itself.
 
-`Magnitude<Rational>` validates the absolute-size role. `Tagged<Domain, Rational>`
-supports checked and ordinary same-domain addition/subtraction and negation,
-preserving the domain in the result. Unit conversion is owned by Ratio.
+Integer literals use StaticBigInt. String parsing accepts signed integers and fractions. Codable now encodes the signed numerator and positive denominator as decimal strings, for example `{"numerator":"-1","denominator":"3"}`. This intentionally replaces the old bounded numeric components and separate polarity field; persisted old payloads require migration. Decoding normalizes fractions and rejects nonpositive denominators.
 
-Build and test through `arithmetic.xcworkspace`, whose local package references
-override the URL dependencies in this package manifest.
+Magnitude and Tagged integrations preserve exact arithmetic. Foundation remains outside the core target. All manifest dependencies use full GitHub URLs; build and test through atoms.xcworkspace for local resolution.

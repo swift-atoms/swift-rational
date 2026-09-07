@@ -10,12 +10,12 @@ extension Tagged where Underlying == Rational, Tag: ~Copyable & ~Escapable {
     public var add: Property<Addition, Self> { Property(self) }
     public var subtract: Property<Subtraction, Self> { Property(self) }
 
-    public func adding(_ other: Self) throws(Rational.Error) -> Self {
-        Self(_unchecked: try underlying.add.exact(other.underlying))
+    public func adding(_ other: Self) -> Self {
+        Self(_unchecked: underlying.add.exact(other.underlying))
     }
 
-    public func subtracting(_ other: Self) throws(Rational.Error) -> Self {
-        Self(_unchecked: try underlying.subtract.exact(other.underlying))
+    public func subtracting(_ other: Self) -> Self {
+        Self(_unchecked: underlying.subtract.exact(other.underlying))
     }
 
     public static prefix func - (value: Self) -> Self {
@@ -35,13 +35,13 @@ extension Tagged where Underlying == Rational, Tag: ~Copyable & ~Escapable {
 }
 
 extension Property {
-    public func exact<T: ~Copyable & ~Escapable>(_ other: Base) throws(Rational.Error) -> Base
+    public func exact<T: ~Copyable & ~Escapable>(_ other: Base) -> Base
     where Tag == Addition, Base == Tagged<T, Rational> {
-        try base.adding(other)
+        base.adding(other)
     }
 
-    public func exact<T: ~Copyable & ~Escapable>(_ other: Base) throws(Rational.Error) -> Base
+    public func exact<T: ~Copyable & ~Escapable>(_ other: Base) -> Base
     where Tag == Subtraction, Base == Tagged<T, Rational> {
-        try base.subtracting(other)
+        base.subtracting(other)
     }
 }

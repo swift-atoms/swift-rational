@@ -21,9 +21,9 @@ extension `Rational Tagged Tests` {
     }
 
     @Test
-    func `checked quantities expose representational overflow`() throws {
-        let maximum = Tagged<Unit, Rational>(_unchecked: try Rational(numerator: .max))
-        #expect(throws: Rational.Error.overflow) { try maximum.add.exact(.one) }
-        #expect(throws: Rational.Error.overflow) { try (-maximum).subtract.exact(.one) }
+    func `exact quantities grow beyond machine integer bounds`() throws {
+        let maximum = Tagged<Unit, Rational>(_unchecked: try Rational(numerator: UInt128.max))
+        #expect(maximum.add.exact(.one) - maximum == .one)
+        #expect((-maximum).subtract.exact(.one) + maximum == -Tagged<Unit, Rational>.one)
     }
 }

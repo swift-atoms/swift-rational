@@ -6,3 +6,4 @@
 @_exported public import Property
 @_exported public import Subtraction
 @_exported public import Tagged
+@_exported public import Integer

@@ -8,13 +8,13 @@ extension Rational {
 }
 
 extension Property where Tag == Addition, Base == Rational {
-    public func exact(_ other: Base) throws(Rational.Error) -> Base {
-        try base.adding(other)
+    public func exact(_ other: Base) -> Base {
+        base.adding(other)
     }
 }
 
 extension Property where Tag == Subtraction, Base == Rational {
-    public func exact(_ other: Base) throws(Rational.Error) -> Base {
-        try base.subtracting(other)
+    public func exact(_ other: Base) -> Base {
+        base.subtracting(other)
     }
 }

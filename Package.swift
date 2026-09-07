@@ -6,11 +6,12 @@ let package = Package(
     platforms: [.macOS(.v27), .iOS(.v27), .tvOS(.v27), .watchOS(.v27), .visionOS(.v27)],
     products: [
         .library(name: "Rational", targets: ["Rational"]),
-        .library(name: "Rational Standard Library Integration", targets: ["Rational Standard Library Integration"]),
-        .library(name: "Rational Foundation Library Integration", targets: ["Rational Foundation Library Integration"]),
+
+        .library(name: "Rational Foundation Integration", targets: ["Rational Foundation Integration"]),
         .library(name: "Rational Test Support", targets: ["Rational Test Support"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/swift-atoms/swift-integer.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-property.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-addition.git", branch: "main"),
@@ -24,6 +25,7 @@ let package = Package(
         .target(
             name: "Rational",
             dependencies: [
+                .product(name: "Integer", package: "swift-integer"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Property", package: "swift-property"),
                 .product(name: "Addition", package: "swift-addition"),
@@ -35,20 +37,13 @@ let package = Package(
             ],
             path: "Sources/Rational"
         ),
+
         .target(
-            name: "Rational Standard Library Integration",
+            name: "Rational Foundation Integration",
             dependencies: [
                 .target(name: "Rational"),
             ],
-            path: "Sources/Rational Standard Library Integration"
-        ),
-        .target(
-            name: "Rational Foundation Library Integration",
-            dependencies: [
-                .target(name: "Rational"),
-                .target(name: "Rational Standard Library Integration"),
-            ],
-            path: "Sources/Rational Foundation Library Integration"
+            path: "Sources/Rational Foundation Integration"
         ),
         .target(
             name: "Rational Test Support",
@@ -61,6 +56,7 @@ let package = Package(
             name: "Rational Tests",
             dependencies: [
                 .target(name: "Rational"),
+                .product(name: "Integer", package: "swift-integer"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Property", package: "swift-property"),
                 .product(name: "Addition", package: "swift-addition"),
@@ -70,8 +66,7 @@ let package = Package(
                 .product(name: "Magnitude", package: "swift-magnitude"),
                 .product(name: "Polarity", package: "swift-polarity"),
                 .target(name: "Rational Test Support"),
-                .target(name: "Rational Standard Library Integration"),
-                .target(name: "Rational Foundation Library Integration"),
+                .target(name: "Rational Foundation Integration"),
             ],
             path: "Tests/Rational Tests"
         ),

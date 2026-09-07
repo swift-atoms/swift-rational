@@ -11,8 +11,8 @@ extension `Rational Tests` {
     @Test
     func `fractions are reduced and zero is canonical`() throws {
         let value = try Rational(numerator: 60, denominator: 120, polarity: .negative)
-        #expect(value.numerator == 1 && value.denominator == 2 && value.polarity == .negative)
-        #expect(try Rational(numerator: 0, denominator: .max, polarity: .negative) == .zero)
+        #expect(value.numerator == -1 && value.denominator == 2 && value.polarity == .negative)
+        #expect(try Rational(numerator: 0, denominator: UInt128.max, polarity: .negative) == .zero)
         #expect(Rational.zero.polarity == nil && Rational.zero.denominator == 1)
         #expect(throws: Rational.Error.denominator) { try Rational(numerator: 0, denominator: 0) }
         #expect(throws: Rational.Error.zero) { try Rational.zero.inverted() }
@@ -40,22 +40,22 @@ extension `Rational Tests` {
 
     @Test
     func `full-width products cancel before storage overflow`() throws {
-        let lhs = try Rational(numerator: .max, denominator: UInt128.max - 1)
+        let lhs = try Rational(numerator: UInt128.max, denominator: UInt128.max - 1)
         #expect(try lhs.multiplied(by: lhs.inverted()) == .one)
         #expect(try lhs.subtracting(Rational(numerator: 1, denominator: UInt128.max - 1)) == .one)
         #expect(try lhs.subtracting(lhs) == .zero)
-        let half = try Rational(numerator: .max, denominator: 2)
-        let maximum = try Rational(numerator: .max)
+        let half = try Rational(numerator: UInt128.max, denominator: 2)
+        let maximum = try Rational(numerator: UInt128.max)
         #expect(try half.adding(half) == maximum)
         #expect(try (-half).adding(-half) == -maximum)
         #expect(try maximum.adding(-maximum) == .zero)
-        #expect(throws: Rational.Error.overflow) { try maximum.adding(.one) }
-        #expect(throws: Rational.Error.overflow) { try maximum.multiplied(by: Rational(2)) }
+        #expect(maximum.adding(.one) - maximum == .one)
+        #expect(try maximum.multiplied(by: Rational(2)).divided(by: 2) == maximum)
     }
 
     @Test
     func `comparison uses exact full-width cross products`() throws {
-        let a = try Rational(numerator: .max, denominator: UInt128.max - 1)
+        let a = try Rational(numerator: UInt128.max, denominator: UInt128.max - 1)
         let b = try Rational(numerator: UInt128.max - 1, denominator: UInt128.max - 2)
         #expect(a < b)
         #expect(-b < -a)
@@ -74,13 +74,13 @@ extension `Rational Tests` {
 
     @Test
     func `integer boundaries include Int128 minimum and unsigned maximum`() throws {
-        #expect(try Rational(Int128.min).integer() == .min)
+        #expect(try Rational(Int128.min).integer(as: Int128.self) == .min)
         #expect(try Rational.one.applying(to: Int128.min) == .min)
         #expect(try Rational(numerator: 1, denominator: 2).applying(to: Int128.min) == Int128.min / 2)
         #expect(throws: Rational.Error.overflow) { try Rational(-1).applying(to: Int128.min) }
-        #expect(throws: Rational.Error.inexact) { try Rational(numerator: 1, denominator: 2).integer() }
+        #expect(throws: Rational.Error.inexact) { try Rational(numerator: 1, denominator: 2).integer(as: Int128.self) }
         #expect(try Rational.one.applying(to: UInt128.max) == .max)
-        #expect(try Rational(numerator: .max, denominator: 2).applying(to: UInt128(2)) == .max)
+        #expect(try Rational(numerator: UInt128.max, denominator: 2).applying(to: UInt128(2)) == .max)
         #expect(throws: Rational.Error.unrepresentable) { try Rational(-1).applying(to: UInt128(1)) }
     }
 
@@ -107,7 +107,7 @@ extension `Rational Tests` {
 
     @Test
     func `Codable round trips full-width fractions and rejects invalid denominators`() throws {
-        let value = try Rational(numerator: .max, denominator: UInt128.max - 1, polarity: .negative)
+        let value = try Rational(numerator: UInt128.max, denominator: UInt128.max - 1, polarity: .negative)
         #expect(try JSONDecoder().decode(Rational.self, from: JSONEncoder().encode(value)) == value)
         #expect(throws: (any Error).self) {
             try JSONDecoder().decode(Rational.self, from: Data(#"{"numerator":1,"denominator":0,"polarity":{"positive":{}}}"#.utf8))
@@ -122,8 +122,8 @@ extension `Rational Tests` {
         let lhs = try Rational(numerator: UInt128.max, denominator: denominator)
         let rhs = try Rational(numerator: UInt128.max - 2, denominator: denominator)
         #expect(try lhs.add.exact(rhs) == Rational(2))
-        let a = try Rational(numerator: 1, denominator: .max)
+        let a = try Rational(numerator: 1, denominator: UInt128.max)
         let b = try Rational(numerator: 1, denominator: UInt128.max - 1)
-        #expect(throws: Rational.Error.overflow) { try a.adding(b) }
+        #expect(a.adding(b).subtracting(b) == a)
     }
 }
