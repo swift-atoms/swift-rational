@@ -1,7 +1,7 @@
 import Rational
 import Testing
 
-@Suite struct `Arbitrary precision rational` {
+@Suite struct `Arbitrary precision rationals preserve field laws and normalization` {
     @Test func `large exact fractions retain cancellation equality and hash`() throws {
         let large = try Rational(10).raised(to: 120)
         let third = try Rational(1).divided(by: 3)
@@ -29,7 +29,7 @@ import Testing
         }
     }
 
-    @Test func `sign normalization negative powers and zero division`() throws {
+    @Test func `Signs normalize and negative powers invert while zero division fails`() throws {
         #expect(-Rational.zero == .zero)
         #expect(try Rational(-2).raised(to: -3) == Rational(-1).divided(by: 8))
         #expect(try Rational.zero.raised(to: 0) == .one)

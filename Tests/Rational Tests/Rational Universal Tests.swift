@@ -2,8 +2,8 @@ import Rational
 import Testing
 import Foundation
 
-@Suite struct UniversalRationalTests {
-    @Test func signedComponentsAndArbitraryPrecisionSerialization() throws {
+@Suite struct `Rationals validate arbitrary precision construction and conversion` {
+    @Test func `Signed components serialize with arbitrary precision`() throws {
         let a = try Rational(numerator: -6, denominator: -8)
         #expect(a.numerator == 3 && a.denominator == 4)
         let b = try Rational(numerator: 6, denominator: -8)
@@ -18,7 +18,7 @@ import Foundation
         #expect(Rational(2).root(2) == nil)
     }
 
-    @Test func destinationRangeIsCheckedAfterExactArithmetic() throws {
+    @Test func `Destination ranges are checked after exact arithmetic`() throws {
         let enormous = try Rational(10).raised(to: 200)
         #expect(try (enormous + 1 - enormous).integer(as: Int8.self) == 1)
         #expect(throws: Rational.Error.overflow) { try enormous.integer(as: Int128.self) }

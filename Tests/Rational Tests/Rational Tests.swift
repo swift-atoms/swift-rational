@@ -5,9 +5,9 @@ import Rational
 import Testing
 
 @Suite
-struct `Rational Tests` {}
+struct `Rationals preserve canonical fractions through exact arithmetic and conversion` {}
 
-extension `Rational Tests` {
+extension `Rationals preserve canonical fractions through exact arithmetic and conversion` {
     @Test
     func `fractions are reduced and zero is canonical`() throws {
         let value = try Rational(numerator: 60, denominator: 120, polarity: .negative)
@@ -115,7 +115,7 @@ extension `Rational Tests` {
     }
 }
 
-extension `Rational Tests` {
+extension `Rationals preserve canonical fractions through exact arithmetic and conversion` {
     @Test
     func `denominator reduction happens after full-width addition`() throws {
         let denominator = UInt128.max - 1
