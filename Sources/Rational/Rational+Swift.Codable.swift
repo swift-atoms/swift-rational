@@ -1,4 +1,4 @@
-public import Integer
+import Integer
 #if !hasFeature(Embedded)
 extension Rational: Swift.Codable {
     private enum CodingKeys: String, CodingKey { case numerator, denominator }

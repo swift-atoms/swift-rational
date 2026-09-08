@@ -1,4 +1,4 @@
-public import Integer
+import Integer
 public import Polarity
 extension Rational {
     public init<T: Swift.BinaryInteger>(_ value: T) { self.init(Integer(value)) }
