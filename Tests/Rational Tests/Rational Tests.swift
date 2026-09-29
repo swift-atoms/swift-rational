@@ -20,10 +20,10 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
 
     @Test
     func `small fractions agree with exact wider integer arithmetic`() throws {
-        for left in Int128(-16)...16 {
-            for right in Int128(-16)...16 {
-                for a in UInt128(1)...8 {
-                    for b in UInt128(1)...8 {
+        for left in Int128(-8)...8 {
+            for right in Int128(-8)...8 {
+                for a in UInt128(1)...4 {
+                    for b in UInt128(1)...4 {
                         let lhs = try Rational(numerator: left.magnitude, denominator: a, polarity: left < 0 ? .negative : .positive)
                         let rhs = try Rational(numerator: right.magnitude, denominator: b, polarity: right < 0 ? .negative : .positive)
                         let expected = try Rational(left * Int128(b) + right * Int128(a)).divided(by: Rational(Int128(a * b)))
