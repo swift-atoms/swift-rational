@@ -27,11 +27,11 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
                         let lhs = try Rational(numerator: left.magnitude, denominator: a, polarity: left < 0 ? .negative : .positive)
                         let rhs = try Rational(numerator: right.magnitude, denominator: b, polarity: right < 0 ? .negative : .positive)
                         let expected = try Rational(left * Int128(b) + right * Int128(a)).divided(by: Rational(Int128(a * b)))
-                        #expect(try lhs.adding(rhs) == expected)
-                        #expect(try lhs.subtracting(rhs).adding(rhs) == lhs)
+                        #expect(lhs.adding(rhs) == expected)
+                        #expect(lhs.subtracting(rhs).adding(rhs) == lhs)
                         #expect((lhs < rhs) == (left * Int128(b) < right * Int128(a)))
                         let product = try Rational(left * right).divided(by: Rational(Int128(a * b)))
-                        #expect(try lhs.multiplied(by: rhs) == product)
+                        #expect(lhs.multiplied(by: rhs) == product)
                     }
                 }
             }
@@ -43,12 +43,12 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
         let lhs = try Rational(numerator: UInt128.max, denominator: UInt128.max - 1)
         #expect(try lhs.multiplied(by: lhs.inverted()) == .one)
         #expect(try lhs.subtracting(Rational(numerator: 1, denominator: UInt128.max - 1)) == .one)
-        #expect(try lhs.subtracting(lhs) == .zero)
+        #expect(lhs.subtracting(lhs) == .zero)
         let half = try Rational(numerator: UInt128.max, denominator: 2)
         let maximum = try Rational(numerator: UInt128.max)
-        #expect(try half.adding(half) == maximum)
-        #expect(try (-half).adding(-half) == -maximum)
-        #expect(try maximum.adding(-maximum) == .zero)
+        #expect(half.adding(half) == maximum)
+        #expect((-half).adding(-half) == -maximum)
+        #expect(maximum.adding(-maximum) == .zero)
         #expect(maximum.adding(.one) - maximum == .one)
         #expect(try maximum.multiplied(by: Rational(2)).divided(by: 2) == maximum)
     }
@@ -121,7 +121,7 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
         let denominator = UInt128.max - 1
         let lhs = try Rational(numerator: UInt128.max, denominator: denominator)
         let rhs = try Rational(numerator: UInt128.max - 2, denominator: denominator)
-        #expect(try lhs.add.exact(rhs) == Rational(2))
+        #expect(lhs.add.exact(rhs) == Rational(2))
         let a = try Rational(numerator: 1, denominator: UInt128.max)
         let b = try Rational(numerator: 1, denominator: UInt128.max - 1)
         #expect(a.adding(b).subtracting(b) == a)
