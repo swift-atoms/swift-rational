@@ -10,7 +10,7 @@ public struct Rational: Hashable, Sendable {
 }
 
 extension Rational {
-    public enum Error: Swift.Error, Hashable, Sendable {
+    public enum Error: Swift::Error, Hashable, Sendable {
         case denominator
         case zero
 

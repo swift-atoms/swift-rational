@@ -1,6 +1,6 @@
 import Integer
 #if !hasFeature(Embedded)
-extension Rational: Swift.Codable {
+extension Rational: Swift::Codable {
     private enum CodingKeys: String, CodingKey { case numerator, denominator }
     public init(from decoder: any Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)

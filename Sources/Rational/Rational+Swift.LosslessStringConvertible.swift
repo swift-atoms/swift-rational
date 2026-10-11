@@ -1,5 +1,5 @@
 import Integer
-extension Rational: Swift.LosslessStringConvertible {
+extension Rational: Swift::LosslessStringConvertible {
 
     public init?(_ description: String) {
         let parts = description.split(separator: "/", omittingEmptySubsequences: false)
