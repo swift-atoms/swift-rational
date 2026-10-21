@@ -37,9 +37,9 @@ extension Rational {
         var count = exponent.absolute
         var result = Self.one
         while !count.isZero {
-            if count.isOdd { result = result * factor }
+            if count.isOdd { result *= factor }
             count = Self.trapping { try count.quotientAndRemainder(dividingBy: 2).quotient }
-            if !count.isZero { factor = factor * factor }
+            if !count.isZero { factor *= factor }
         }
         return result
     }
