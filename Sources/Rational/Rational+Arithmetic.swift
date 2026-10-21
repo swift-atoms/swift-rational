@@ -8,22 +8,25 @@ extension Rational {
 
     public func adding(_ other: Self) -> Self {
         let common = Integer.gcd(denominator, other.denominator)
-        let left = try! denominator.quotientAndRemainder(dividingBy: common).quotient
-        let right = try! other.denominator.quotientAndRemainder(dividingBy: common).quotient
+        let left = Self.trapping { try denominator.quotientAndRemainder(dividingBy: common).quotient }
+        let right = Self.trapping { try other.denominator.quotientAndRemainder(dividingBy: common).quotient }
         return Self(reducing: numerator * right + other.numerator * left, denominator: left * other.denominator)
     }
 
     public func subtracting(_ other: Self) -> Self { adding(-other) }
 
-
     public func multiplied(by other: Self) -> Self {
         if numerator.isZero || other.numerator.isZero { return .zero }
         let a = Integer.gcd(numerator, other.denominator)
         let b = Integer.gcd(other.numerator, denominator)
-        let n = try! numerator.quotientAndRemainder(dividingBy: a).quotient
-            * other.numerator.quotientAndRemainder(dividingBy: b).quotient
-        let d = try! denominator.quotientAndRemainder(dividingBy: b).quotient
-            * other.denominator.quotientAndRemainder(dividingBy: a).quotient
+        let n = Self.trapping {
+            try numerator.quotientAndRemainder(dividingBy: a).quotient
+                * other.numerator.quotientAndRemainder(dividingBy: b).quotient
+        }
+        let d = Self.trapping {
+            try denominator.quotientAndRemainder(dividingBy: b).quotient
+                * other.denominator.quotientAndRemainder(dividingBy: a).quotient
+        }
         return Self(reducing: n, denominator: d)
     }
 
@@ -35,12 +38,11 @@ extension Rational {
         var result = Self.one
         while !count.isZero {
             if count.isOdd { result = result * factor }
-            count = try! count.quotientAndRemainder(dividingBy: 2).quotient
+            count = Self.trapping { try count.quotientAndRemainder(dividingBy: 2).quotient }
             if !count.isZero { factor = factor * factor }
         }
         return result
     }
-
 
     public func root(_ degree: Int) -> Self? {
         guard let n = numerator.root(degree), let d = denominator.root(degree) else { return nil }

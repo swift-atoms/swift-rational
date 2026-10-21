@@ -2,8 +2,6 @@ public import Integer
 public import Magnitude
 public import Polarity
 
-
-
 public struct Rational: Hashable, Sendable {
     public let numerator: Integer
     public let denominator: Integer
@@ -31,11 +29,31 @@ extension Rational {
 
     internal init(reducing numerator: Integer, denominator: Integer) {
         precondition(!denominator.isZero)
-        if numerator.isZero { self.numerator = .zero; self.denominator = .one; return }
+        if numerator.isZero {
+            self.numerator = .zero
+            self.denominator = .one
+            return
+        }
         let common = Integer.gcd(numerator, denominator)
         let sign = denominator.isNegative
-        self.numerator = try! (sign ? -numerator : numerator).quotientAndRemainder(dividingBy: common).quotient
-        self.denominator = try! denominator.absolute.quotientAndRemainder(dividingBy: common).quotient
+        self.numerator = Self.trapping {
+            try (sign ? -numerator : numerator).quotientAndRemainder(dividingBy: common).quotient
+        }
+        self.denominator = Self.trapping {
+            try denominator.absolute.quotientAndRemainder(dividingBy: common).quotient
+        }
+    }
+
+    /// Evaluates `body`, whose failure would violate an invariant of the call site.
+    ///
+    /// Used for exact division by a non-zero common divisor and for validating
+    /// values that are valid by construction.
+    internal static func trapping<T>(_ body: () throws -> T) -> T {
+        do {
+            return try body()
+        } catch {
+            preconditionFailure("Invariant violated: \(error)")
+        }
     }
 
     public static var zero: Self { Self(Integer.zero) }
@@ -52,5 +70,5 @@ extension Rational: Magnitude::Scalar {
 }
 extension Rational: Magnitude::Representable {
     public typealias Magnitude = Magnitude::Magnitude<Rational>
-    public var magnitude: Magnitude { try! Magnitude(validating: absolute) }
+    public var magnitude: Magnitude { Self.trapping { try Magnitude(validating: absolute) } }
 }

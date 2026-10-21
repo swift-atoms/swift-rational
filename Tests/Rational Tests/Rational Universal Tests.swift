@@ -1,6 +1,6 @@
+import Foundation
 import Rational
 import Testing
-import Foundation
 
 @Suite struct `Rationals validate arbitrary precision construction and conversion` {
     @Test func `Signed components serialize with arbitrary precision`() throws {
@@ -8,7 +8,7 @@ import Foundation
         #expect(a.numerator == 3 && a.denominator == 4)
         let b = try Rational(numerator: 6, denominator: -8)
         #expect(b.numerator == -3 && b.denominator == 4)
-        let value: Rational = 123456789012345678901234567890123456789012345678901234567890
+        let value: Rational = 123_456_789_012_345_678_901_234_567_890_123_456_789_012_345_678_901_234_567_890
         #expect(value == Rational(value.description))
         let fraction = try value.divided(by: value + 1)
         #expect(try JSONDecoder().decode(Rational.self, from: JSONEncoder().encode(fraction)) == fraction)

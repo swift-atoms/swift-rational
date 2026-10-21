@@ -1,4 +1,5 @@
 import Integer
+
 extension Rational: Swift::LosslessStringConvertible {
 
     public init?(_ description: String) {

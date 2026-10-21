@@ -1,2 +1,2 @@
-@_exported public import Rational
 import Foundation
+@_exported public import Rational
