@@ -48,11 +48,11 @@ extension Rational {
     ///
     /// Used for exact division by a non-zero common divisor and for validating
     /// values that are valid by construction.
-    internal static func trapping<T>(_ body: () throws -> T) -> T {
+    internal static func trapping<T, Failure: Swift::Error>(_ body: () throws(Failure) -> T) -> T {
         do {
             return try body()
         } catch {
-            preconditionFailure("Invariant violated: \(error)")
+            preconditionFailure("Invariant violated")
         }
     }
 
