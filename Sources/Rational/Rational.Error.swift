@@ -1,6 +1,6 @@
-public import Integer
-public import Magnitude
-public import Polarity
+import Integer
+import Magnitude
+import Polarity
 
 
 extension Rational {
