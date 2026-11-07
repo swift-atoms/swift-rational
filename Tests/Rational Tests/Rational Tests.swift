@@ -109,7 +109,7 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
     func `Codable round trips full-width fractions and rejects invalid denominators`() throws {
         let value = try Rational(numerator: UInt128.max, denominator: UInt128.max - 1, polarity: .negative)
         #expect(try JSONDecoder().decode(Rational.self, from: JSONEncoder().encode(value)) == value)
-        #expect(throws: (any Error).self) {
+        #expect(throws: (any Swift.Error).self) {
             try JSONDecoder().decode(Rational.self, from: Data(#"{"numerator":1,"denominator":0,"polarity":{"positive":{}}}"#.utf8))
         }
     }
