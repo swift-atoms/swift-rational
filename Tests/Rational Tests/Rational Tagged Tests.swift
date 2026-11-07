@@ -4,10 +4,14 @@ import Testing
 
 private enum Unit {}
 
-@Suite
-struct `Rational arithmetic preserves the tagged quantity domain` {}
+enum `Rational Tagged Tests` {}
 
-extension `Rational arithmetic preserves the tagged quantity domain` {
+extension `Rational Tagged Tests` {
+    @Suite
+    struct `Rational arithmetic preserves the tagged quantity domain` {}
+}
+
+extension `Rational Tagged Tests`.`Rational arithmetic preserves the tagged quantity domain` {
     @Test
     func `checked and ordinary arithmetic preserve the quantity domain`() throws {
         let half = Tagged<Unit, Rational>(_unchecked: try Rational(numerator: 1, denominator: 2))

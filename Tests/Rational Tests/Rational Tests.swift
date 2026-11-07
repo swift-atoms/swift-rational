@@ -4,10 +4,14 @@ import Polarity
 import Rational
 import Testing
 
-@Suite
-struct `Rationals preserve canonical fractions through exact arithmetic and conversion` {}
+enum `Rational Tests` {}
 
-extension `Rationals preserve canonical fractions through exact arithmetic and conversion` {
+extension `Rational Tests` {
+    @Suite
+    struct `Rationals preserve canonical fractions through exact arithmetic and conversion` {}
+}
+
+extension `Rational Tests`.`Rationals preserve canonical fractions through exact arithmetic and conversion` {
     @Test
     func `fractions are reduced and zero is canonical`() throws {
         let value = try Rational(numerator: 60, denominator: 120, polarity: .negative)
@@ -115,7 +119,7 @@ extension `Rationals preserve canonical fractions through exact arithmetic and c
     }
 }
 
-extension `Rationals preserve canonical fractions through exact arithmetic and conversion` {
+extension `Rational Tests`.`Rationals preserve canonical fractions through exact arithmetic and conversion` {
     @Test
     func `denominator reduction happens after full-width addition`() throws {
         let denominator = UInt128.max - 1
