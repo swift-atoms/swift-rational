@@ -2,7 +2,6 @@ import Integer
 import Magnitude
 import Polarity
 
-
 extension Rational {
     public enum Error: Swift::Error, Hashable, Sendable {
         case denominator

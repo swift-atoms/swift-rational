@@ -9,7 +9,6 @@ public struct Rational: Hashable, Sendable {
 
 extension Rational {
 
-
     public init(numerator: Integer, denominator: Integer = 1, polarity: Polarity = .positive) throws(Error) {
         guard !denominator.isZero else { throw .denominator }
         self.init(reducing: polarity == .negative ? -numerator : numerator, denominator: denominator)
