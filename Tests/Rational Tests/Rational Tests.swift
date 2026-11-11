@@ -131,3 +131,23 @@ extension `Rational Tests`.`Rationals preserve canonical fractions through exact
         #expect(a.adding(b).subtracting(b) == a)
     }
 }
+
+extension `Rational Tests`.`Rationals preserve canonical fractions through exact arithmetic and conversion` {
+    @Test
+    func `floor and ceiling bracket every fraction and meet on whole numbers`() throws {
+        for numerator in Int128(-25)...25 {
+            for denominator in UInt128(1)...6 {
+                let value = try Rational(numerator: numerator.magnitude, denominator: denominator, polarity: numerator < 0 ? .negative : .positive)
+                let (floor, ceiling) = (Rational(value.floor), Rational(value.ceiling))
+                #expect(floor <= value && value < floor + 1)
+                #expect(ceiling - 1 < value && value <= ceiling)
+                #expect((floor == ceiling) == (value.denominator == 1))
+            }
+        }
+        let half = try Rational(numerator: 7, denominator: 2)
+        #expect(half.floor == 3 && half.ceiling == 4)
+        #expect((-half).floor == -4 && (-half).ceiling == -3)
+        let wide = try Rational(numerator: UInt128.max, denominator: 2)
+        #expect(Rational(wide.floor) + Rational(wide.ceiling) == Rational(UInt128.max))
+    }
+}
