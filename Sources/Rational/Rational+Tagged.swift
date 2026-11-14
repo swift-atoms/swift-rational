@@ -6,6 +6,7 @@ public import Tagged
 extension Tagged where Underlying == Rational, Tag: ~Copyable & ~Escapable {
     public static var zero: Self { Self(_unchecked: .zero) }
     public static var one: Self { Self(_unchecked: .one) }
+    public static var half: Self { Self(_unchecked: .half) }
 
     public var add: Property<Addition, Self> { Property(self) }
     public var subtract: Property<Subtraction, Self> { Property(self) }

@@ -22,6 +22,7 @@ extension `Rational Tagged Tests`.`Rational arithmetic preserves the tagged quan
         #expect(half + third == sum)
         #expect(sum - third == half)
         #expect(half + (-half) == .zero)
+        #expect(half == .half && Tagged<Unit, Rational>.half + .half == .one)
     }
 
     @Test

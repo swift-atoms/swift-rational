@@ -50,6 +50,7 @@ extension Rational {
 
     public static var zero: Self { Self(Integer.zero) }
     public static var one: Self { Self(Integer.one) }
+    public static var half: Self { Self(reducing: .one, denominator: 2) }
     public var polarity: Polarity? { numerator.isZero ? nil : numerator.isNegative ? .negative : .positive }
     public var absolute: Self { numerator.isNegative ? -self : self }
     public static prefix func - (value: Self) -> Self {
@@ -200,6 +201,62 @@ extension Rational {
     public var ceiling: Integer { -(-self).floor }
 }
 
+extension Rational {
+    /// The exact value of a finite binary floating-point number: 0.1 as a `Double` is
+    /// 3602879701896397/36028797018963968. Every finite value fits, so converting the result back
+    /// with `approximation(as:)` gives the same value. Infinity and NaN are unrepresentable.
+    public init<Scalar: Swift::BinaryFloatingPoint>(exactly value: Scalar) throws(Error) {
+        guard value.isFinite else { throw .unrepresentable }
+        let bias = (1 << (Scalar.exponentBitCount - 1)) - 1
+        let encoded = Int(value.exponentBitPattern)
+        let hidden = encoded == 0 ? Integer.zero : Self.trapping { () throws(Error) in try Self(2).raised(to: Scalar.significandBitCount) }.numerator
+        let whole = Self(Integer(value.significandBitPattern) + hidden)
+        let scale = Self.trapping { () throws(Error) in try Self(2).raised(to: max(encoded, 1) - bias - Scalar.significandBitCount) }
+        self = value.sign == .minus ? -(whole * scale) : whole * scale
+    }
+
+    /// The nearest multiple of one over `denominator`, which must be positive. Its distance to the
+    /// value is at most half of one over `denominator`; a tie rounds away from zero, as `rounded()`
+    /// does for floating point (5/8 to quarters is 3/4, -5/8 is -3/4). The result is reduced.
+    public func rounded(denominator: Integer) throws(Error) -> Self {
+        guard denominator > .zero else { throw .denominator }
+        let steps = (self * Self(denominator)).absolute + .half
+        return Self(reducing: numerator.isNegative ? -steps.floor : steps.floor, denominator: denominator)
+    }
+
+    /// The nearest rational whose denominator is at most the range's bound, which must be positive:
+    /// no fraction with a denominator in `1...bound` lies closer to the value. A tie rounds away from
+    /// zero. A value whose denominator is already within the bound is returned unchanged. Found by
+    /// continued fractions: the two closest fractions on either side are a convergent and a
+    /// semiconvergent.
+    public func rounded(denominator range: PartialRangeThrough<Integer>) throws(Error) -> Self {
+        let bound = range.upperBound
+        guard bound > .zero else { throw .denominator }
+        guard denominator > bound else { return self }
+        var (p0, q0, p1, q1): (Integer, Integer, Integer, Integer) = (0, 1, 1, 0)
+        var (n, d) = (numerator, denominator)
+        while let a = Optional(Self(reducing: n, denominator: d).floor), q0 + a * q1 <= bound {
+            (p0, q0, p1, q1) = (p1, q1, p0 + a * p1, q0 + a * q1)
+            (n, d) = (d, n - a * d)
+        }
+        let k = Self(reducing: bound - q0, denominator: q1).floor
+        let candidates = [Self(reducing: p0 + k * p1, denominator: q0 + k * q1), Self(reducing: p1, denominator: q1)]
+        let distances = candidates.map { ($0 - self).absolute }
+        if distances[0] != distances[1] { return distances[0] < distances[1] ? candidates[0] : candidates[1] }
+        return candidates[0].absolute > candidates[1].absolute ? candidates[0] : candidates[1]
+    }
+
+    @_disfavoredOverload
+    public func rounded<T: Swift::BinaryInteger>(denominator: T) throws(Error) -> Self {
+        try rounded(denominator: Integer(denominator))
+    }
+
+    @_disfavoredOverload
+    public func rounded<T: Swift::BinaryInteger>(denominator range: PartialRangeThrough<T>) throws(Error) -> Self {
+        try rounded(denominator: ...Integer(range.upperBound))
+    }
+}
+
 extension Rational: Swift::Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.numerator * rhs.denominator < rhs.numerator * lhs.denominator
@@ -224,11 +281,33 @@ extension Rational: Swift::ExpressibleByIntegerLiteral {
 
 extension Rational: Swift::LosslessStringConvertible {
 
+    /// Reads either `numerator/denominator`, each an optionally signed run of decimal digits with a
+    /// non-zero denominator, or a decimal: an optional sign, one or more digits and optionally a
+    /// point followed by one or more digits (`3`, `-12.25`, `+0.50`). A decimal is read exactly as
+    /// its digits over a power of ten, with no floating point on the way. Anything else is `nil`.
     public init?(_ description: String) {
+        if description.utf8.contains(UInt8(ascii: ".")) {
+            self.init(decimal: description)
+            return
+        }
         let parts = description.split(separator: "/", omittingEmptySubsequences: false)
         guard (1...2).contains(parts.count), let n = Integer(String(parts[0])) else { return nil }
         let d = parts.count == 2 ? Integer(String(parts[1])) : .one
         guard let d, !d.isZero else { return nil }
         self.init(reducing: n, denominator: d)
+    }
+
+    private init?(decimal text: String) {
+        var digits = text.utf8[...]
+        let negative = digits.first == UInt8(ascii: "-")
+        if negative || digits.first == UInt8(ascii: "+") { digits = digits.dropFirst() }
+        let parts = digits.split(separator: UInt8(ascii: "."), omittingEmptySubsequences: false)
+        guard
+            parts.count == 2,
+            parts.allSatisfy({ !$0.isEmpty && $0.allSatisfy { (UInt8(ascii: "0")...UInt8(ascii: "9")).contains($0) } }),
+            let whole = Integer(String(decoding: Array(parts[0]) + Array(parts[1]), as: UTF8.self)),
+            let scale = Integer("1" + String(repeating: "0", count: parts[1].count))
+        else { return nil }
+        self.init(reducing: negative ? -whole : whole, denominator: scale)
     }
 }

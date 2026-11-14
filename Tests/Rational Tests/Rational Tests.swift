@@ -151,3 +151,13 @@ extension `Rational Tests`.`Rationals preserve canonical fractions through exact
         #expect(Rational(wide.floor) + Rational(wide.ceiling) == Rational(UInt128.max))
     }
 }
+
+extension `Rational Tests`.`Rationals preserve canonical fractions through exact arithmetic and conversion` {
+    @Test
+    func `zero one and half are the canonical constants they name`() throws {
+        #expect(Rational.half == (try Rational(numerator: 1, denominator: 2)))
+        #expect(Rational.half + .half == .one)
+        #expect(Rational.half.numerator == 1 && Rational.half.denominator == 2)
+        #expect(Rational.zero == 0 && Rational.one == 1)
+    }
+}
